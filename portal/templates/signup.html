@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Create an account</h1>
+  {% if problem %}<div class="notice notice--error" role="alert">{{ problem }}</div>{% endif %}
+  <form method="post" action="{{ url_for('signup') }}">
+    {{ csrf_field() }}
+    <label class="field">Your name or centre name
+      <input type="text" name="name" value="{{ name }}" maxlength="80" required autocomplete="organization">
+    </label>
+    <label class="field">Email
+      <span class="hint">Used only to log in. The portal never sends email.</span>
+      <input type="email" name="email" value="{{ email }}" maxlength="200" required autocomplete="email">
+    </label>
+    <label class="field">Password
+      <span class="hint">At least 8 characters.</span>
+      <input type="password" name="password" minlength="8" maxlength="200" required autocomplete="new-password">
+    </label>
+    {% if needs_code %}
+    <label class="field">Invite code
+      <input type="text" name="code" required autocomplete="off">
+    </label>
+    {% endif %}
+    <button class="btn" type="submit">Create account</button>
+  </form>
+  <p class="muted" style="margin-top:1rem">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+</div>
+{% endblock %}

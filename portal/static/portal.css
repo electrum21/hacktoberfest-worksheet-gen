@@ -1,0 +1,222 @@
+/* Worksheet portal.
+   Idea: a school exercise book. Blue-ink answers on ruled lines, a red margin rule,
+   and red pen reserved for marks and feedback. Everything else stays quiet.
+   No external fonts or requests: students are minors, and the portal should work offline-ish. */
+
+:root {
+  --desk: #e8edf3;
+  --grid: rgba(36, 70, 201, 0.06);
+  --paper: #fdfeff;
+  --ink: #14213d;
+  --ink-soft: #4a5875;
+  --rule: #c5d3e6;
+  --edge: #b3c3da;
+  --blue: #2446c9;
+  --blue-dark: #1a34a0;
+  --blue-wash: #eef2ff;
+  --red: #c8352e;
+  --green: #1f7a55;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+          "Helvetica Neue", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font: 1rem/1.5 var(--sans);
+  background-color: var(--desk);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .5rem; }
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; }
+p { margin: 0 0 .75rem; }
+a { color: var(--blue); }
+a:hover { color: var(--blue-dark); }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .9em; }
+.muted { color: var(--ink-soft); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+.wrap { max-width: 44rem; margin: 0 auto; padding: 1rem 1rem 4rem; }
+.wrap.wide { max-width: 66rem; }
+
+/* ---------- top bar (tutor pages) ---------- */
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .75rem 1rem; background: var(--paper); border-bottom: 2px solid var(--edge);
+}
+.bar a.brand { color: var(--ink); font-weight: 700; text-decoration: none; }
+.bar form { margin: 0; }
+
+/* ---------- buttons and fields ---------- */
+.btn {
+  display: inline-block; min-height: 44px; padding: .65rem 1.1rem;
+  font: 600 1rem var(--sans); text-decoration: none; text-align: center;
+  color: #fff; background: var(--blue); border: 2px solid var(--blue);
+  border-radius: 8px; cursor: pointer;
+}
+.btn:hover { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff; }
+.btn:disabled { background: var(--rule); border-color: var(--rule); color: var(--ink-soft); cursor: not-allowed; }
+.btn--ghost { background: transparent; color: var(--blue); }
+.btn--ghost:hover { background: var(--blue-wash); color: var(--blue-dark); }
+.btn--danger { background: transparent; color: var(--red); border-color: var(--red); }
+.btn--danger:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.btn--small { min-height: 36px; padding: .35rem .7rem; font-size: .9rem; }
+
+label.field { display: block; margin-bottom: .9rem; font-weight: 600; }
+label.field .hint { display: block; font-weight: 400; color: var(--ink-soft); font-size: .9rem; }
+label.field input[type=text], label.field input[type=email], label.field input[type=password] {
+  display: block; width: 100%; min-height: 44px; margin-top: .25rem; padding: .5rem .7rem;
+  font: 1rem var(--sans); color: var(--ink); background: #fff;
+  border: 1.5px solid var(--edge); border-radius: 8px;
+}
+
+.card {
+  background: var(--paper); border: 1.5px solid var(--edge); border-radius: 10px;
+  padding: 1.1rem 1.25rem; margin-bottom: 1.25rem;
+}
+.card h2 { margin-bottom: .75rem; }
+
+.notice { padding: .7rem 1rem; margin-bottom: 1rem; border-radius: 8px; background: var(--blue-wash); border: 1.5px solid var(--blue); }
+.notice--error { background: #fdeeed; border-color: var(--red); color: #7d1f1a; }
+.token-box { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin: .5rem 0; }
+.token-box code { padding: .45rem .6rem; background: #fff; border: 1.5px solid var(--edge); border-radius: 6px; word-break: break-all; }
+
+/* ---------- tables ---------- */
+.table-scroll { overflow-x: auto; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: .95rem; }
+table.tbl th { text-align: left; font-weight: 600; color: var(--ink-soft); padding: .4rem .6rem; border-bottom: 2px solid var(--edge); }
+table.tbl td { padding: .55rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+table.tbl form { display: inline; margin: 0; }
+.actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+.tag {
+  display: inline-block; padding: .05rem .5rem; font-size: .85rem; font-weight: 600;
+  border: 1.5px solid var(--ink-soft); border-radius: 999px; color: var(--ink-soft); white-space: nowrap;
+}
+.tag--wait { border-color: var(--blue); color: var(--blue); }
+.tag--done { border-color: var(--green); color: var(--green); }
+.tag--late { border-color: var(--red); color: var(--red); }
+
+.inline-form { display: grid; grid-template-columns: 2fr 1fr auto; gap: .75rem; align-items: end; }
+.inline-form label.field { margin: 0; }
+@media (max-width: 40rem) { .inline-form { grid-template-columns: 1fr; } }
+
+/* ---------- student pages: the exercise book ---------- */
+.student .wrap { padding-top: 1.25rem; }
+
+.paper {
+  position: relative;
+  background: var(--paper);
+  border: 1.5px solid var(--edge);
+  border-radius: 4px;
+  box-shadow: 0 3px 0 var(--edge);
+  padding: 1.25rem 1rem 1.5rem 3.8rem;
+}
+/* the red margin rule */
+.paper::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 3.2rem; width: 2px;
+  background: var(--red); opacity: .55;
+}
+.paper-head { margin-bottom: 1.25rem; }
+.paper-head h1 { font-family: var(--serif); font-size: 1.6rem; }
+
+.sheet { list-style: none; margin: 0; padding: 0; }
+.q { position: relative; margin-bottom: 2rem; }
+.q-no {
+  position: absolute; left: -3.2rem; top: 0; width: 2rem; text-align: right;
+  font: 700 1.12rem/1.65 var(--sans); color: var(--blue);
+}
+.q-text { font: 1.12rem/1.65 var(--serif); margin-bottom: .25rem; max-width: 40rem; }
+.q-marks { font-size: .85rem; color: var(--ink-soft); margin-bottom: .6rem; }
+
+/* answers look like blue pen on ruled paper */
+.ans {
+  display: block; width: 100%; font: 1.05rem/2rem var(--sans); color: var(--blue-dark);
+  background: transparent; border: 0; border-radius: 0; padding: 0; margin: 0;
+  caret-color: var(--blue);
+}
+input.ans { height: 2.4rem; border-bottom: 2px solid var(--rule); }
+input.ans:focus { outline: none; border-bottom-color: var(--blue); }
+textarea.ans {
+  line-height: 2rem; resize: vertical; min-height: 6rem;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 2px), var(--rule) calc(2rem - 2px), var(--rule) 2rem);
+  background-attachment: local;
+}
+textarea.ans:focus { outline: none; background-color: var(--blue-wash); }
+.ans:disabled { color: var(--ink); opacity: 1; -webkit-text-fill-color: var(--ink); }
+
+/* multiple choice: big tap targets */
+.opts { border: 0; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.opt {
+  position: relative; display: grid; grid-template-columns: 2.2rem 1fr; align-items: center;
+  gap: .6rem; min-height: 3rem; padding: .5rem .75rem;
+  border: 1.5px solid var(--rule); border-radius: 10px; background: #fff; cursor: pointer;
+}
+.opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.opt-letter {
+  display: grid; place-items: center; width: 1.9rem; height: 1.9rem; font-weight: 700;
+  color: var(--blue); border: 1.5px solid var(--blue); border-radius: 50%;
+}
+.opt-text { font-family: var(--serif); font-size: 1.05rem; }
+.opt:has(input:checked) { border-color: var(--blue); background: var(--blue-wash); }
+.opt input:checked + .opt-letter { background: var(--blue); color: #fff; }
+.opt input:focus-visible + .opt-letter { outline: 3px solid var(--blue); outline-offset: 2px; }
+.opt:has(input:disabled) { cursor: default; }
+
+.submit-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--rule);
+}
+.progress { color: var(--ink-soft); }
+
+.preview-note { padding: .5rem .75rem; margin-bottom: 1rem; border: 1.5px dashed var(--blue); border-radius: 8px; background: var(--blue-wash); }
+
+/* red pen: score and feedback */
+.pen { color: var(--red); font-family: var(--serif); }
+.score {
+  display: inline-block; font: italic 700 2.2rem/1 var(--serif); color: var(--red);
+  transform: rotate(-3deg); padding: .2rem .6rem; border: 3px solid var(--red); border-radius: 50%;
+  margin: .25rem 0 .75rem;
+}
+.comment { font: italic 1.1rem/1.5 var(--serif); color: var(--red); margin-bottom: 1rem; max-width: 36rem; }
+
+.assign-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.assign-list a.row {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
+  padding: .85rem 1rem; text-decoration: none; color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--edge); border-radius: 10px; min-height: 56px;
+}
+.assign-list a.row:hover { border-color: var(--blue); }
+.assign-list .title { font: 600 1.1rem var(--serif); }
+
+.empty { padding: 1.5rem 1rem; text-align: center; border: 2px dashed var(--edge); border-radius: 10px; background: var(--paper); }
+
+@media (max-width: 30rem) {
+  .paper { padding-left: 3.4rem; }
+  .paper::before { left: 2.8rem; }
+  .q-no { left: -2.9rem; width: 1.7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  body { background: #fff; }
+  .bar, .submit-bar, .preview-note { display: none; }
+}

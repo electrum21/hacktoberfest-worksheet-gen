@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Done' if code == 200 else 'Problem' }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{{ 'Done' if code == 200 else 'That didn’t work' }}</h1>
+  <p>{{ message }}</p>
+  {% if code == 404 %}<p class="muted">If you were sent a link by your tutor, ask them for a new one.</p>{% endif %}
+  <p><a href="{{ url_for('index') }}">Back to the start</a></p>
+</div>
+{% endblock %}

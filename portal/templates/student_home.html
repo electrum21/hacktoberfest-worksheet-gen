@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Your worksheets{% endblock %}
+{% block bodyclass %}student{% endblock %}
+{% block bar %}{% endblock %}
+{% block content %}
+<h1>Hi {{ student['name'] }}</h1>
+{% if rows %}
+<ul class="assign-list">
+  {% for r in rows %}
+  <li><a class="row" href="{{ url_for('student_sheet', link=student['link_token'], aid=r['id']) }}">
+    <span><span class="title">{{ r['title'] }}</span><br>
+      <span class="muted">{{ r['subject'] }}{% if r['due'] %}{{ ' · ' if r['subject'] }}Due {{ r['due']|day }}{% endif %}</span></span>
+    <span>
+      {% if r['status'] == 'assigned' %}
+        {% if r['due'] and r['due'] < today %}<span class="tag tag--late">Overdue</span>{% else %}<span class="tag tag--wait">To do</span>{% endif %}
+      {% elif r['status'] == 'submitted' %}<span class="tag">Handed in</span>
+      {% else %}<span class="tag tag--done">Marked {{ r['score'] }}/{{ r['total'] }}</span>{% endif %}
+    </span></a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty">Nothing here yet. When your tutor sends a worksheet, it appears on this page.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block wrapclass %} wide{% endblock %}
+{% block content %}
+
+<section class="card">
+  <h2>Connect your laptop app</h2>
+  <p>In the worksheet app, open the <strong>Portal</strong> tab and enter this address and your token.</p>
+  <div class="token-box"><code>{{ base }}</code>
+    <button class="btn btn--ghost btn--small" type="button" data-copy="{{ base }}">Copy address</button></div>
+  {% if new_token %}
+    <div class="notice" role="status">
+      <strong>Your token. It is shown once, so copy it now.</strong>
+      <div class="token-box"><code>{{ new_token }}</code>
+        <button class="btn btn--small" type="button" data-copy="{{ new_token }}">Copy token</button></div>
+    </div>
+  {% else %}
+    <p class="muted">{{ 'A token is set. We only keep a fingerprint of it, so it can’t be shown again.' if has_token else 'No token yet.' }}</p>
+  {% endif %}
+  <form method="post" action="{{ url_for('rotate_token') }}" data-confirm-msg="Create a new token? Your laptop app stops working until you paste the new one in.">{{ csrf_field() }}
+    <button class="btn btn--ghost btn--small" type="submit">Create a new token</button>
+    <span class="muted">Replaces the old one.</span>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Students</h2>
+  <p class="muted">Use first names only. Anyone who has a student’s link can open that student’s worksheets,
+     so send each link privately (for example, to the parent).</p>
+  <form method="post" action="{{ url_for('add_student_web') }}" class="inline-form">
+    {{ csrf_field() }}
+    <label class="field">Name <input type="text" name="name" maxlength="60" required></label>
+    <label class="field">Level <input type="text" name="level" maxlength="30" placeholder="P6, Sec 3"></label>
+    <button class="btn" type="submit">Add student</button>
+  </form>
+  {% if students %}
+  <div class="table-scroll" style="margin-top:1rem"><table class="tbl">
+    <thead><tr><th>Student</th><th>Level</th><th>Open worksheets</th><th>Link</th><th></th></tr></thead>
+    <tbody>
+    {% for s in students %}
+    <tr>
+      <td>{{ s['name'] }}</td><td>{{ s['level'] }}</td><td>{{ s['open_count'] }}</td>
+      <td><button class="btn btn--ghost btn--small" type="button" data-copy="{{ link_for(s['link_token']) }}">Copy link</button></td>
+      <td><div class="actions">
+        <form method="post" action="{{ url_for('rotate_link_web', sid=s['id']) }}" data-confirm-msg="Make a new link for {{ s['name'] }}? The old link stops working straight away.">{{ csrf_field() }}
+          <button class="btn btn--ghost btn--small" type="submit">New link</button></form>
+        <form method="post" action="{{ url_for('remove_student_web', sid=s['id']) }}" data-confirm-msg="Remove {{ s['name'] }} and delete all their worksheets and answers from the portal? This can’t be undone.">{{ csrf_field() }}
+          <button class="btn btn--danger btn--small" type="submit">Remove</button></form>
+      </div></td>
+    </tr>
+    {% endfor %}
+    </tbody></table></div>
+  {% else %}
+  <div class="empty" style="margin-top:1rem">No students yet. Add one above, or link the students from your laptop app.</div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Worksheets</h2>
+  {% if assignments %}
+  <div class="table-scroll"><table class="tbl">
+    <thead><tr><th>Worksheet</th><th>Student</th><th>Due</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for a in assignments %}
+    <tr>
+      <td>{{ a['title'] }}<br><span class="muted">{{ a['subject'] }}</span></td>
+      <td>{{ a['student_name'] }}</td>
+      <td>{{ a['due']|day }}</td>
+      <td>
+        {% if a['status'] == 'assigned' %}<span class="tag tag--wait">Not submitted</span>
+        {% elif a['status'] == 'submitted' %}<span class="tag tag--wait">Submitted. Pull it into your laptop app to mark</span>
+          {% if a['late'] %}<span class="tag tag--late">Late</span>{% endif %}
+        {% else %}<span class="tag tag--done">Marked {{ a['score'] }}/{{ a['total'] }}</span>{% endif %}
+      </td>
+      <td><form method="post" action="{{ url_for('remove_assignment_web', aid=a['id']) }}" data-confirm-msg="{{ 'Remove this worksheet? The student’s answers have not been marked yet and will be deleted.' if a['status'] == 'submitted' else 'Remove this worksheet from the portal?' }}">{{ csrf_field() }}
+        <button class="btn btn--danger btn--small" type="submit">Remove</button></form></td>
+    </tr>
+    {% endfor %}
+    </tbody></table></div>
+  {% else %}
+  <div class="empty">Nothing assigned yet. Assign a worksheet from your laptop app and it shows up here.</div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Your data</h2>
+  <p class="muted">The portal deletes marked worksheets and unsubmitted ones after a retention period.
+     You can also delete everything now.</p>
+  <form method="post" action="{{ url_for('delete_account') }}" class="inline-form" data-confirm-msg="Delete your account and every student’s data? This can’t be undone.">
+    {{ csrf_field() }}
+    <label class="field">Type “delete” to confirm
+      <input type="text" name="confirm" autocomplete="off"></label>
+    <span></span>
+    <button class="btn btn--danger" type="submit">Delete my account and all student data</button>
+  </form>
+</section>
+{% endblock %}

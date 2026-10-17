@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ a['title'] }}{% endblock %}
+{% block bodyclass %}student{% endblock %}
+{% block bar %}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('student_home', link=student['link_token']) }}">All my worksheets</a></p>
+<article class="paper">
+  <header class="paper-head">
+    <h1>{{ a['title'] }}</h1>
+    <p class="muted">{{ student['name'] }} · {{ n }} question{{ '' if n == 1 else 's' }} · {{ total }} mark{{ '' if total == 1 else 's' }}{% if a['due'] %} · Due {{ a['due']|day }}{% endif %}</p>
+    {% if a['status'] == 'marked' %}
+      <p class="score" aria-label="Your score">{{ a['score'] }} / {{ a['total'] }}</p>
+      {% if a['comment'] %}<p class="comment">{{ a['comment'] }}</p>{% endif %}
+    {% elif a['status'] == 'submitted' %}
+      <p class="pen">Handed in{% if a['late'] %} (late){% endif %}. Your tutor will mark it. Your answers are below.</p>
+    {% elif a['due'] and a['due'] < today %}
+      <p class="pen">This was due {{ a['due']|day }}. You can still hand it in.</p>
+    {% endif %}
+  </header>
+
+  {% if a['status'] == 'assigned' %}
+  <form method="post" action="{{ url_for('student_submit', link=student['link_token'], aid=a['id']) }}" data-sheet data-confirm>
+    {{ sheet }}
+    <div class="submit-bar">
+      <span class="progress" data-progress></span>
+      <button class="btn" type="submit">Hand in</button>
+    </div>
+  </form>
+  {% else %}
+  <form data-sheet>{{ sheet }}</form>
+  {% endif %}
+</article>
+{% endblock %}

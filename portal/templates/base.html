@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{% block title %}Worksheet portal{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+<script src="{{ url_for('static', filename='portal.js') }}" defer></script>
+</head>
+<body class="{% block bodyclass %}tutor{% endblock %}">
+{% block bar %}
+<header class="bar">
+  <a class="brand" href="{{ url_for('index') }}">Worksheet portal</a>
+  {% if tutor %}
+  <form method="post" action="{{ url_for('logout') }}">{{ csrf_field() }}
+    <span class="muted">{{ tutor['name'] }}</span>
+    <button class="btn btn--ghost btn--small" type="submit">Log out</button>
+  </form>
+  {% endif %}
+</header>
+{% endblock %}
+<main class="wrap{% block wrapclass %}{% endblock %}">
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}
+  <div class="notice{% if cat == 'error' %} notice--error{% endif %}" role="status">{{ msg }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

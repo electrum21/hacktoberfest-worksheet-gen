@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>A private portal for independent tutors</h1>
+  <p>Make worksheets on your own laptop, preview them as your student will see them, then send each
+     student a private link. Multiple choice is marked instantly. You mark the rest and send back a score.</p>
+  <p class="actions">
+    <a class="btn" href="{{ url_for('signup') }}">Create an account</a>
+    <a class="btn btn--ghost" href="{{ url_for('login') }}">Log in</a>
+  </p>
+</div>
+<div class="card">
+  <h2>How it works</h2>
+  <ol>
+    <li>Generate and check a worksheet in the app on your laptop.</li>
+    <li>Preview it as the student, then assign it to one or more students.</li>
+    <li>Students open their link on any phone or computer and submit.</li>
+    <li>Pull the answers into your laptop app, mark, and send the score back.</li>
+  </ol>
+  <p class="muted">Answer keys, mark schemes and each student's weak-topic profile stay on your laptop.
+     This server holds first names, the questions you assign, and what students answer.</p>
+</div>
+{% endblock %}
