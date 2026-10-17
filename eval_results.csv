@@ -1,17 +1,17 @@
 mode,subject,topic,valid,n,consistent,dups,secs
-baseline,PSLE Math,Ratio,1,5,0,0,63.5
-baseline,PSLE Math,Fractions,1,5,0,0,48.3
-baseline,PSLE Math,Average,1,5,0,0,64.9
-baseline,PSLE Math,Percentage,1,5,0,0,61.3
-baseline,PSLE Science,Water cycle,1,5,0,0,39.8
-baseline,PSLE Science,Heat energy,1,5,0,0,40.0
-baseline,Sec E-Math (O-Level),Quadratic equations and functions,1,5,0,0,59.6
-baseline,Sec E-Math (O-Level),Trigonometry,1,5,1,0,67.3
-improved,PSLE Math,Ratio,0,0,0,0,25.8
-improved,PSLE Math,Fractions,0,0,0,0,13.4
-improved,PSLE Math,Average,0,0,0,0,38.3
-improved,PSLE Math,Percentage,0,0,0,0,55.6
-improved,PSLE Science,Water cycle,0,0,0,0,27.9
-improved,PSLE Science,Heat energy,0,0,0,0,30.1
-improved,Sec E-Math (O-Level),Quadratic equations and functions,0,0,0,0,23.5
-improved,Sec E-Math (O-Level),Trigonometry,0,0,0,0,135.5
+baseline,PSLE Math,Ratio,1,5,3,1,118.0
+baseline,PSLE Math,Fractions,1,5,1,0,45.8
+baseline,PSLE Math,Average,1,5,1,0,871.6
+baseline,PSLE Math,Percentage,1,5,4,0,47.6
+baseline,PSLE Science,Water cycle,1,5,3,0,45.5
+baseline,PSLE Science,Heat energy,1,5,1,0,34.1
+baseline,Sec E-Math (O-Level),Quadratic equations and functions,1,5,1,0,112.2
+baseline,Sec E-Math (O-Level),Trigonometry,1,5,2,0,85.7
+improved,PSLE Math,Ratio,1,5,2,0,125.6
+improved,PSLE Math,Fractions,1,5,2,0,183.5
+improved,PSLE Math,Average,1,5,4,0,54.5
+improved,PSLE Math,Percentage,1,5,4,0,496.5
+improved,PSLE Science,Water cycle,1,5,4,0,43.8
+improved,PSLE Science,Heat energy,1,5,1,0,50.9
+improved,Sec E-Math (O-Level),Quadratic equations and functions,1,5,1,0,737.9
+improved,Sec E-Math (O-Level),Trigonometry,1,5,2,0,147.6

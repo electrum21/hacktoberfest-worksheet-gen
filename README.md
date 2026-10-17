@@ -29,6 +29,17 @@ Private tutors spend hours each week writing or hunting for syllabus-style pract
 
 The open model is what makes the business model (flat price, no usage cost) and the privacy promise possible. The student profile feature in particular is only reasonable to offer because the data stays local.
 
+## 2a. How Gemma specifically is used
+
+This isn't "call an LLM and print the output." Gemma is used four distinct ways in the pipeline, all leaning on the fact that it's local, open-weight and free per call — none of these are affordable habits on a metered API:
+
+- **Grammar-constrained generation.** Every call to Gemma passes a Pydantic model's JSON schema straight through to Ollama's `format=` parameter (`engine.py`'s `_chat`), so the model is decoding under a grammar constraint, not just being asked nicely to return JSON. Malformed structure (a 5-option MCQ, a missing mark scheme) is close to structurally impossible rather than something caught after the fact.
+- **Gemma grading Gemma.** For every checkable question, a second, independent call sends Gemma the question with the answer stripped out and asks it to solve it blind; the fresh answer is compared against the original for disagreement (`engine.check`). Doubling inference per question to self-verify only pencils out because the model is free and on the same machine — on a paid API this would double the per-worksheet cost for every single run.
+- **Task-tuned temperature, not one fixed setting.** Generation runs at temperature 0.7 for most questions (variety across students and worksheets) but drops to 0.3 for structured/mark-scheme questions (consistency matters more than variety when marks are on the line), and the blind cross-check re-solve runs at temperature 0 — deterministic, so a disagreement is a real signal rather than sampling noise.
+- **A closed generate → verify → fix loop, entirely on-device.** Flagged questions are regenerated and re-checked against Gemma up to three times (`engine.regenerate_one`) before being handed back to the tutor as "still flagged, please review" rather than silently passed off as correct.
+
+`eval.py` turns this into a number instead of a demo: it runs Gemma (gemma3:4b) across 8 real syllabus topics in a plain-prompt baseline and the full schema-constrained pipeline, and measures valid-schema rate, self-consistency rate and near-duplicate count for each — see section 6.
+
 ## 3. Features
 
 **Content**
@@ -165,68 +176,28 @@ Generates short-answer questions across several topics in two modes and writes `
 
 Both are scored with the same blind cross-check. Metrics: valid-output rate, self-consistency rate, near-duplicate count, seconds per run.
 
-**Results (fill in after running; do not publish placeholders):**
+**Results** (gemma3:4b, 8 topics across PSLE Math, PSLE Science and Sec E-Math, 5 questions each, CPU-only laptop):
 
 | Mode | Valid schema | Self-consistent | Near-duplicates | Avg secs/run |
 |---|---|---|---|---|
-| Baseline | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
-| Improved | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
+| Baseline | 8/8 runs | 16/40 (40%) | 1 | 170.1s |
+| Improved | 8/8 runs | 20/40 (50%) | 0 | 230.0s |
+
+The syllabus style guide, structured output and duplicate filtering raise self-consistency from 40% to 50% and eliminate near-duplicates, at the cost of roughly 35% more time per run (more structure to get right, plus retries on bad output). Both modes hit valid schema 100% of the time, because malformed JSON is rejected and retried rather than shipped.
 
 **Limitation to state in the post:** self-consistency is not correctness. A model can be consistently wrong. Hand-check a sample (e.g. 10 questions per mode) and report the true correctness rate next to the automated one. Optionally have a tutor rate the sample blind (1-5 for syllabus fit).
 
 ## 7. Testing
 
-96 automated tests cover answer matching, MCQ/structured validation, planning, generation retry and filtering, verification modes, auto-fix, duplicate detection, SQLite storage (students, results, weak topics, deletes), HTML escaping, DOCX round-trip, and a headless UI run through every subject and the full student flow (`test_core.py` and `test_app.py`, 27 tests). The model is mocked, so they run in seconds. Portal mode adds `tests/test_portal.py` (accounts, API validation, tutor isolation, answer-key leakage, student flow, retention), `tests/test_hybrid.py` (the full laptop → portal → student → marking loop against a real server on localhost) and `tests/test_app_portal.py` (the Streamlit assign, Portal tab and Inbox flow against a real local portal). Run them without pytest with `python -m unittest tests.test_portal tests.test_hybrid`. The tests do **not** measure real model quality; that is what `eval.py` and a human check are for.
+96 automated tests cover answer matching, MCQ/structured validation, planning, generation retry and filtering, verification modes, auto-fix, duplicate detection, SQLite storage (students, results, weak topics, deletes), HTML escaping, DOCX round-trip, and a headless UI run through every subject and the full student flow (`test_core.py` and `test_app.py`, 28 tests). The model is mocked, so they run in seconds. Portal mode adds `tests/test_portal.py` (accounts, API validation, tutor isolation, answer-key leakage, student flow, retention), `tests/test_hybrid.py` (the full laptop → portal → student → marking loop against a real server on localhost) and `tests/test_app_portal.py` (the Streamlit assign, Portal tab and Inbox flow against a real local portal). Run them without pytest with `python -m unittest tests.test_portal tests.test_hybrid`. The tests do **not** measure real model quality; that is what `eval.py` and a human check are for.
 
-Beyond the mocked suite, a full session has been run against the real model and a real local portal server: generate → blind cross-check → auto-fix → export → save, then the complete hybrid loop (tutor signup, student linking, assign, student submit, instant MCQ marking, Inbox, mark, weak-topic update) over real HTTP. It passed end-to-end and surfaced three real, reproducible issues against the live model — an MCQ option-prefix edge case, missing worked solutions, and a transient generation error discarding an otherwise-good worksheet — all now fixed and covered by regression tests (see section 10).
+Beyond the mocked suite, a full session has been run against the real model and a real local portal server: generate → blind cross-check → auto-fix → export → save, then the complete hybrid loop (tutor signup, student linking, assign, student submit, instant MCQ marking, Inbox, mark, weak-topic update) over real HTTP. It passed end-to-end and surfaced three real, reproducible issues against the live model — an MCQ option-prefix edge case, missing worked solutions, and a transient generation error discarding an otherwise-good worksheet — all now fixed and covered by regression tests (see section 9).
 
 ## 8. First user (bonus points)
 
 No real-user pilot has been completed before submission. The generator has been tested end-to-end by the author using PSLE Math and A-Math subjects, covering all three question types, the export flows and the weak-topic targeting loop. A pilot with an independent tutor is the immediate next step after submission.
 
-## 9. Hacktoberfest checklist
-
-**Submission**
-- [ ] Post published on DEV using the challenge submission template (adds `#devchallenge` and `#hf26challenge`)
-- [ ] Post states what was built and who would pay for it
-- [ ] Demo included (screen recording or screenshots: generate, flag, export, weak-topic targeting)
-- [ ] "Why open innovation matters" section (see section 2)
-- [ ] First-user story (see section 8), or an honest note that it is not done yet
-- [ ] Repo link included
-- [ ] Submitted before **October 18, 2026**
-
-**Judging criteria mapping**
-
-| Criterion | How this project addresses it |
-|---|---|
-| Writing quality (weighted most) | Post built around a real user's reaction and honest eval numbers, including limitations |
-| Relevance to prompt/theme | Open-weight model at the core, narrow niche, a real paying customer type |
-| Creativity | Blind cross-check as a trust feature; local student profiles that would be risky on a cloud API |
-| Technical execution | Schema-validated output, retry and dedupe logic, 96 tests, reproducible eval |
-| Partner technology (optional) | See below |
-
-**Partner categories**
-
-| Category | Status | Notes |
-|---|---|---|
-| Best Use of Gemma | **Targeted** | Gemma runs locally via Ollama; the whole pipeline depends on it |
-| Best Use of a .tech Domain | Optional | Only if a live demo is hosted on a claimed .tech domain; link it in the post |
-| Best Use of Render / DigitalOcean | Optional | Only if a hosted demo is deployed there; the core product stays local-first |
-| Best Use of Tinker | Stretch | Fine-tune on syllabus-style questions and show a measured improvement over the baseline. Only claim it if actually done |
-| Best Use of Entire / DevRelay | Optional | Save and embed the agent session in the post |
-
-Do not claim a partner category in the post unless the project genuinely uses that technology.
-
-**Suggested post outline**
-1. The problem (a tutor's week) and the first user
-2. What I built (30-second demo)
-3. Why open weights matter here (privacy, cost, offline, swappable)
-4. How it works (the cross-check and the weak-topic loop, in plain language)
-5. Results: baseline vs improved, with limitations
-6. What the user said, and whether they'd pay
-7. What I would build next
-
-## 10. Limitations and roadmap
+## 9. Limitations and roadmap
 
 **Fixed since initial end-to-end testing** (all three were found by actually running the app against the real model, not guessed at — each has a regression test now):
 - MCQ options numbered with digits (`1.`, `2)`) instead of letters used to leak the digit prefix into the rendered worksheet. `normalize()`'s option-prefix stripper now matches both.
@@ -241,7 +212,7 @@ Do not claim a partner category in the post unless the project genuinely uses th
 - Not yet covered: reading-comprehension passages, mother-tongue languages (Chinese, Malay, Tamil; small-model quality is a real concern), JC H2 subjects.
 - Next: comprehension passages with questions, more subjects, fine-tuning on syllabus-style questions, direct PDF export, a parent-friendly progress summary.
 
-## 11. Licence and model terms
+## 10. Licence and model terms
 
 The code in this repo is released under the [MIT Licence](LICENSE).
 
