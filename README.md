@@ -16,8 +16,6 @@ A local-first practice worksheet generator for Singapore private tutors, coverin
 
 ## Demo
 
-<!-- PLACEHOLDER: upload the demo video/GIF to GitHub assets (drag it into this file's edit box, or into a PR/issue comment) and replace the line below with the URL it gives you. -->
-
 https://github.com/user-attachments/assets/471a0e37-ccac-4307-8467-29250a6fc4d6
 
 Shows: generating a worksheet, a flagged question getting caught and replaced, exporting to Word, and the use of the student-tutor portal that runs directly from the tutor's laptop.
