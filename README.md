@@ -1,10 +1,25 @@
 # Worksheet Generator for Tutors
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
+[![Model: Gemma 3 4B](https://img.shields.io/badge/model-gemma3%3A4b-4285F4.svg)](https://ollama.com/library/gemma3)
+[![Tests: 96 passing](https://img.shields.io/badge/tests-96%20passing-brightgreen.svg)](#7-testing)
+[![Hacktoberfest 2026](https://img.shields.io/badge/hacktoberfest-2026-blueviolet.svg)](https://hacktoberfest.com)
+
 > Hacktoberfest Open-Source AI Challenge: Week 2 (theme: **Side Hustle**)
 > Tags: `#devchallenge` `#hf26challenge`
 > Primary category: **Best Use of Gemma**
 
 A local-first practice worksheet generator for Singapore private tutors, covering PSLE and O-Level. It runs an open-weight model (Gemma) through Ollama, so the whole thing works on a tutor's laptop with no internet, no API key and no per-worksheet cost. Student names and weak topics never leave the machine, unless you choose to connect the optional portal (section 5a), in which case only first names, the worksheets you assign and the students' answers pass through it.
+
+---
+
+## Demo
+
+<!-- PLACEHOLDER: upload the demo video/GIF to GitHub assets (drag it into this file's edit box, or into a PR/issue comment) and replace the line below with the URL it gives you. -->
+<video src="PASTE_GITHUB_ASSET_URL_HERE" controls width="700"></video>
+
+Shows: generating a worksheet, a flagged question getting caught and replaced, exporting to Word, and "Target weak topics" building a worksheet from a student's actual mistakes.
 
 ---
 
